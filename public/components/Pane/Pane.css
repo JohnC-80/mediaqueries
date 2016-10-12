@@ -1,0 +1,19 @@
+@import '../../globals/vars.css';
+
+.root{
+    border: 1px solid #777;
+    width: 50%;
+    height: 100%;
+}
+
+@media (--small){
+    .root{
+        background-color: #900;
+    }
+}
+
+@media (--largeUp){
+    .root{
+        background-color: #090;
+    }
+}
