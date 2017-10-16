@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import css from '!style!css!./globals/global.css'
+import css from '!style-loader!css-loader!./globals/global.css'
 import Pane from './components/Pane/Pane'
 import mediaHandler from './util/media'
 

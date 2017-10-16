@@ -1,17 +1,19 @@
-import css from 'css'
-import media from '!css!../globals/vars.css'
+import postcss from 'postcss';
+import media from '!css-loader!../globals/vars.css';
 
 class mediaHandler{
     constructor(){
-        var parsed = css.parse(media.toString());
+        const parsed = postcss.parse(media.toString());
+        console.log(parsed);
         this.mediaObject = {};
-        parsed.stylesheet.rules.map(function(rule){
-            if(rule.type === 'custom-media'){
-                this.mediaObject[rule.name.substr(2)] = {media: rule.media}; //name removes '--'
-            }
-        },this);
-        
-        for(var size in this.mediaObject){
+        const rules = parsed.nodes.filter((n) => {return n.name == 'custom-media';});
+        rules.forEach((rule) => {
+            const ruleName = new RegExp(/^-+(\S*)\s/).exec(rule.params)[1]; // get the query name..
+            const ruleMedia = new RegExp(/(\(.*\))/).exec(rule.params)[1]; // get the query
+            this.mediaObject[ruleName] = {media: ruleMedia}; //name removes '--'
+        });
+
+        for(let size in this.mediaObject){
             this.mediaObject[size].mql = window.matchMedia(this.mediaObject[size].media);
             if(this.mediaObject[size].mql.matches){
                 this.mediaObject.initialSize = size;
@@ -26,7 +28,6 @@ class mediaHandler{
     addListener(size, handler){
         if(this.mediaObject.hasOwnProperty(size)){
             this.mediaObject[size].mql.onchange = handler;
-            //this.mediaObject[size].mql.addListener(handler);
             if(this.mediaObject[size].mql.matches === true){
                 handler(this.mediaObject[size].mql);
             }
@@ -36,4 +37,4 @@ class mediaHandler{
     }
     
 }
-export default mediaHandler
+export default mediaHandler;

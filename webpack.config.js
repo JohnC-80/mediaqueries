@@ -1,34 +1,67 @@
 require('webpack');
+const path = require('path');
+const postCssImport = require('postcss-import');
+const postCssUrl = require('postcss-url');
+const autoprefixer = require('autoprefixer');
+const postCssCustomProperties = require('postcss-custom-properties');
+const postCssCalc = require('postcss-calc');
+const postCssNesting = require('postcss-nesting');
+const postCssCustomMedia = require('postcss-custom-media');
+const postCssMediaMinMax = require('postcss-media-minmax');
+const postCssColorFunction = require('postcss-color-function');
+
 module.exports = {
     entry: './public/app.js',
-    output:{
+    output: {
         path: './public/bundle',
         publicPath: 'bundle/',
         filename: 'bundle.js'
     },
-    module:{
-        loaders:[
+    module: {
+        rules: [
             {
                 test: /.js$/,
-                exclude: /node_modules/,
-                loader: 'babel'
+                exclude: path.resolve(__dirname, 'node_modules'),
+                loader: 'babel-loader',
+                options: {
+                    cacheDirectory: true,
+                    presets: [
+                        [require.resolve('babel-preset-env'), { modules: false }],
+                        [require.resolve('babel-preset-stage-2')],
+                        [require.resolve('babel-preset-react')],
+                    ],
+                },
             },
             {
-                test: /.css$/,
-                exclude: /node_modules/,
-                loader: 'style!css?modules&localIdentName=[local]--[hash:base64:5]!postcss'
-            }
+                test: /\.css$/,
+                use: [
+                    {
+                        loader: 'style-loader',
+                    },
+                    {
+                        loader: 'css-loader?modules&localIdentName=[local]---[hash:base64:5]',
+                    },
+                    {
+                        loader: 'postcss-loader',
+                        options: {
+                            plugins() {
+                                return [
+                                    postCssImport,
+                                    postCssUrl,
+                                    autoprefixer,
+                                    postCssCustomProperties,
+                                    postCssCalc,
+                                    postCssNesting,
+                                    postCssCustomMedia,
+                                    postCssMediaMinMax,
+                                    postCssColorFunction,
+                                ];
+                            },
+                        },
+                    },
+                ],
+            },
         ]
     },
-    postcss(webpack){
-        return [
-            require('postcss-import')({addDependencyTo:webpack}),
-            require('postcss-url'),
-            require('postcss-css-next')
-        ]
-    },
-    node: {
-        fs: "empty"
-      }
 };
 
